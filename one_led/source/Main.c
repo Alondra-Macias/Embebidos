@@ -64,6 +64,7 @@ int main(void) {
   GPIOE->PDOR |= 0x04000000;
 
 	GPIOC->PDDR &=~(0x40);
+	GPIOA->PDDR &=~(0x10);
 	/**Configures GPIOB pin21 as output*/
 	GPIOB->PDDR = 0x00200000;
 	/**Configures GPIOB pin22 as output*/
@@ -76,16 +77,21 @@ int main(void) {
     	/**Reads all the GPIOC*/
 		inputValue = GPIOC->PDIR;
 		/**Masks the GPIOC in the bit of interest*/
-		inputValue = inputValue & 0x40;
+		inputValue = inputValue & 0x50;
 		/**Note that the comparison is not inputValur == False, because it is safer if we switch the arguments*/
-		if (contador>=5){contador=0;}
-		if(FALSE == inputValue) //evaluar primero si los 2 estan apretados?
-		{contador=6;}
-		else if (TRUE == inputValue) //evaluar sw2
+		if (contador>=5 ){contador=0;}
+		else if (contador==0){contador=5;}
+		if(0x50 == inputValue ) //evaluar primero si los 2 estan apretados?
+		{GPIOB->PDOR &= ~0x00200000;/**Blue led off*/
+		GPIOE->PDOR &= ~(0x4000000);/**Green led on*/
+		GPIOB->PDOR &= ~(0x00400000);/**Red led on*/
+		delay(65000);
+		}
+		else if (0x40 == inputValue) //evaluar sw2
 		{
 			contador++;
 		}
-		else if (TRUE == inputValue) //evaluar  sw3
+		else if (0x10 == inputValue) //evaluar  sw3
 		{
 			contador--;
 		}
@@ -99,18 +105,31 @@ int main(void) {
 			GPIOE->PDOR |= 0x4000000;/**Green led off*/
 			delay(65000);
 			break;
-		case 1:
-			GPIOB->PDOR &= ~(0x00200000);/**Blue led on*/
-			delay(65000);
-			break;
-		case 2:
-			GPIOB->PDOR &= ~(0x00400000);/**Read led on*/
-			delay(65000);
-			break;
-		case 3:
+		case 1: //yellow
+			GPIOB->PDOR &= ~(0x0400000);/**red led on*/
 			GPIOE->PDOR &= ~(0x4000000);/**Green led on*/
 			delay(65000);
 			break;
+		case 2: //red
+			GPIOB->PDOR &= ~(0x00400000);/**Red led on*/
+			delay(65000);
+			break;
+		case 3: //purple
+			GPIOB->PDOR &= ~(0x00400000);/**Red led on*/
+			GPIOB->PDOR &= ~0x00200000;/**Blue led off*/
+			delay(65000);
+			break;
+		case 4: //blue
+			GPIOB->PDOR &= ~0x00200000;/**Blue led off*/
+			delay(65000);
+			break;
+		case 5: //green
+			GPIOE->PDOR &= ~(0x4000000);/**Green led on*/
+			delay(65000);
+			break;
+		case 6: //white
+			GPIOE->PDOR &= ~(0x4000000);/**Green led on*/
+						delay(65000);
 				default:
 		break;			 }
 
