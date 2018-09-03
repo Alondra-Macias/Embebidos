@@ -45,23 +45,23 @@ void delay(uint16 delay);
  */
 int main(void) {
 	/**Variable to capture the input value*/
-	uint32 inputValue = 0;
-
-	/**Activating the GPIOB, GPIOC and GPIOE clock gating*/
-	SIM->SCGC5 = 0x2C00;
-	/**Pin control configuration of GPIOB pin22 and pin21 as GPIO*/
-	PORTB->PCR[21] = 0x00000100;
-	PORTB->PCR[22] = 0x00000100;
-	/**Pin control configuration of GPIOC pin6 as GPIO with is pull-up resistor enabled*/
-	PORTC->PCR[6] = 0x00000103;
-	/**Pin control configuration of GPIOE pin26 as GPIO*/
-	PORTE->PCR[26] = 0x00000100;
-	/**Assigns a safe value to the output pin21 of the GPIOB*/
-	GPIOB->PDOR = 0x00200000;
-	/**Assigns a safe value to the output pin22 of the GPIOB*/
-	GPIOB->PDOR |= 0x00400000;
-	/**Assigns a safe value to the output pin26 of the GPIOE*/
-	GPIOE->PDOR |= 0x04000000;
+			uint32 inputValue = 0;
+	
+	/*Initializes Clock Gating for ports A, B, C and E*/
+  SIM->SCGC5 = 0x2E00;
+  /*Configure pins for GPIO*/
+  PORTA->PCR[4] = 0x00000103; //SWITCH3
+  PORTB->PCR[21] = PORT_PCR_MUX(1);
+  PORTB->PCR[22] = PORT_PCR_MUX(1);
+  PORTC->PCR[6] = 0x00000103;	//SWITCH2
+  PORTE->PCR[26] = PORT_PCR_MUX(1);
+  
+  /**Assigns a safe value to the output pin21 of the GPIOB*/
+  GPIOB->PDOR = 0x00200000;
+  /**Assigns a safe value to the output pin22 of the GPIOB*/
+  GPIOB->PDOR |= 0x00400000;
+  /**Assigns a safe value to the output pin26 of the GPIOE*/
+  GPIOE->PDOR |= 0x04000000;
 
 	GPIOC->PDDR &=~(0x40);
 	/**Configures GPIOB pin21 as output*/
