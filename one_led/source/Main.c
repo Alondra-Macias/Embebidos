@@ -75,25 +75,28 @@ int main(void) {
 	int contador=0;
     while(1) {
     	/**Reads all the GPIOC*/
-		inputValue = GPIOC->PDIR;
+		inputValue = GPIOC->PDIR | GPIOA->PDIR ;
 		/**Masks the GPIOC in the bit of interest*/
 		inputValue = inputValue & 0x50;
 		/**Note that the comparison is not inputValur == False, because it is safer if we switch the arguments*/
-		if (contador>=5 ){contador=0;}
-		else if (contador==0){contador=5;}
-		if(0x50 == inputValue ) //evaluar primero si los 2 estan apretados?
+
+		if(FALSE == inputValue ) //evaluar primero si los 2 estan apretados
 		{GPIOB->PDOR &= ~0x00200000;/**Blue led off*/
 		GPIOE->PDOR &= ~(0x4000000);/**Green led on*/
 		GPIOB->PDOR &= ~(0x00400000);/**Red led on*/
+		printf("los 2\n");
 		delay(65000);
 		}
 		else if (0x40 == inputValue) //evaluar sw2
 		{
+			if (contador>=5 ){contador=0;}
 			contador++;
+			printf("contador =%d\n", contador);
 		}
 		else if (0x10 == inputValue) //evaluar  sw3
-		{
+		{ 	if (contador==0){contador=6;}
 			contador--;
+			printf("contador =%d\n", contador);
 		}
 
 		switch(contador){ //0: apagar todo 1:verde 2:azul 3:morado 4:rojo 5:amarillo
@@ -127,9 +130,6 @@ int main(void) {
 			GPIOE->PDOR &= ~(0x4000000);/**Green led on*/
 			delay(65000);
 			break;
-		case 6: //white
-			GPIOE->PDOR &= ~(0x4000000);/**Green led on*/
-						delay(65000);
 				default:
 		break;			 }
 
