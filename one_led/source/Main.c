@@ -45,105 +45,119 @@ void delay(uint16 delay);
  */
 int main(void) {
 	/**Variable to capture the input value*/
-			uint32 inputValue = 0;
-	
-	/*Initializes Clock Gating for ports A, B, C and E*/
-  SIM->SCGC5 = 0x2E00;
-  /*Configure pins for GPIO*/
-  PORTA->PCR[4] = 0x00000103; //SWITCH3
-  PORTB->PCR[21] = PORT_PCR_MUX(1);
-  PORTB->PCR[22] = PORT_PCR_MUX(1);
-  PORTC->PCR[6] = 0x00000103;	//SWITCH2
-  PORTE->PCR[26] = PORT_PCR_MUX(1);
-  
-  /**Assigns a safe value to the output pin21 of the GPIOB*/
-  GPIOB->PDOR = 0x00200000;
-  /**Assigns a safe value to the output pin22 of the GPIOB*/
-  GPIOB->PDOR |= 0x00400000;
-  /**Assigns a safe value to the output pin26 of the GPIOE*/
-  GPIOE->PDOR |= 0x04000000;
+		uint32 inputValue = 0;
 
-	GPIOC->PDDR &=~(0x40);
-	GPIOA->PDDR &=~(0x10);
-	/**Configures GPIOB pin21 as output*/
-	GPIOB->PDDR = 0x00200000;
-	/**Configures GPIOB pin22 as output*/
-	GPIOB->PDDR |= 0x00400000;
-	/**Configures GPIOE pin26 as output*/
-	GPIOE->PDDR |= 0x04000000;
+		/*Initializes Clock Gating for ports A, B, C and E*/
+	  SIM->SCGC5 = 0x2E00;
+	  /*Configure pins for GPIO*/
+	  PORTA->PCR[4] = 0x00000103; //SWITCH3
+	  PORTB->PCR[21] = PORT_PCR_MUX(1);
+	  PORTB->PCR[22] = PORT_PCR_MUX(1);
+	  PORTC->PCR[6] = 0x00000103;	//SWITCH2
+	  PORTE->PCR[26] = PORT_PCR_MUX(1);
 
-	int contador=0;
-    while(1) {
-    	/**Reads all the GPIOC*/
-		inputValue = GPIOC->PDIR | GPIOA->PDIR ;
-		/**Masks the GPIOC in the bit of interest*/
-		inputValue = inputValue & 0x50;
-		/**Note that the comparison is not inputValur == False, because it is safer if we switch the arguments*/
+	  /**Assigns a safe value to the output pin21 of the GPIOB*/
+	  GPIOB->PDOR = 0x00200000;
+	  /**Assigns a safe value to the output pin22 of the GPIOB*/
+	  GPIOB->PDOR |= 0x00400000;
+	  /**Assigns a safe value to the output pin26 of the GPIOE*/
+	  GPIOE->PDOR |= 0x04000000;
 
-		if(FALSE == inputValue ) //evaluar primero si los 2 estan apretados
-		{GPIOB->PDOR &= ~0x00200000;/**Blue led off*/
-		GPIOE->PDOR &= ~(0x4000000);/**Green led on*/
-		GPIOB->PDOR &= ~(0x00400000);/**Red led on*/
-		printf("los 2\n");
-		delay(65000);
-		}
-		else if (0x40 == inputValue) //evaluar sw2
-		{
-			if (contador>=5 ){contador=0;}
-			contador++;
-			printf("contador =%d\n", contador);
-		}
-		else if (0x10 == inputValue) //evaluar  sw3
-		{ 	if (contador==0){contador=6;}
-			contador--;
-			printf("contador =%d\n", contador);
-		}
+		GPIOC->PDDR &=~(0x40);
+		GPIOA->PDDR &=~(0x10);
+		/**Configures GPIOB pin21 as output*/
+		GPIOB->PDDR = 0x00200000;
+		/**Configures GPIOB pin22 as output*/
+		GPIOB->PDDR |= 0x00400000;
+		/**Configures GPIOE pin26 as output*/
+		GPIOE->PDDR |= 0x04000000;
 
-		switch(contador){ //0: apagar todo 1:verde 2:azul 3:morado 4:rojo 5:amarillo
-		case 0:
-			GPIOB->PDOR |= 0x00200000;/**Blue led off*/
-			delay(65000);
-			GPIOB->PDOR |= 0x00400000;/**Read led off*/
-			delay(65000);
-			GPIOE->PDOR |= 0x4000000;/**Green led off*/
-			delay(65000);
-			break;
-		case 1: //yellow
-			GPIOB->PDOR &= ~(0x0400000);/**red led on*/
+		int contador=0;
+	    while(1) {
+	    	/**Reads all the GPIOC*/
+			inputValue = GPIOC->PDIR | GPIOA->PDIR ;
+			/**Masks the GPIOC in the bit of interest*/
+			inputValue = inputValue & 0x50;
+			/**Note that the comparison is not inputValur == False, because it is safer if we switch the arguments*/
+
+			if(FALSE == inputValue ) //evaluar primero si los 2 estan apretados
+			{GPIOB->PDOR &= ~0x00200000;/**Blue led off*/
 			GPIOE->PDOR &= ~(0x4000000);/**Green led on*/
-			delay(65000);
-			break;
-		case 2: //red
 			GPIOB->PDOR &= ~(0x00400000);/**Red led on*/
+			printf("los 2\n");
 			delay(65000);
-			break;
-		case 3: //purple
-			GPIOB->PDOR &= ~(0x00400000);/**Red led on*/
-			GPIOB->PDOR &= ~0x00200000;/**Blue led off*/
-			delay(65000);
-			break;
-		case 4: //blue
-			GPIOB->PDOR &= ~0x00200000;/**Blue led off*/
-			delay(65000);
-			break;
-		case 5: //green
-			GPIOE->PDOR &= ~(0x4000000);/**Green led on*/
-			delay(65000);
-			break;
-				default:
-		break;			 }
+			}
+			else if (0x40 == inputValue) //evaluar sw2
+			{
+				if (contador>=5 )
+				{
+					contador=0;
+				}
+				contador++;
+				printf("contador =%d\n", contador);
+			}
+			else if (0x10 == inputValue) //evaluar  sw3
+			{ 	if (contador<=1)
+				{
+				contador=6;
+				}
+				contador--;
+				printf("contador =%d\n", contador);
+			}
 
-		//apagar todo de nuevo
-			GPIOB->PDOR |= 0x00200000;/**Blue led off*/
+			switch(contador){ //0: apagar todo 1:verde 2:azul 3:morado 4:rojo 5:amarillo
+			case 0:
+				GPIOB->PDOR |= 0x00200000;/**Blue led off*/
+				delay(65000);
+				GPIOB->PDOR |= 0x00400000;/**Read led off*/
+				delay(65000);
+				GPIOE->PDOR |= 0x4000000;/**Green led off*/
+				delay(65000);
+				break;
+			case 1: //yellow
+
+					GPIOB->PDOR &= ~(0x0400000);/**red led on*/
+					GPIOB->PDOR |= 0x00200000;/**Blue led off*/
+					GPIOE->PDOR &= ~(0x4000000);/**Green led on*/
+					delay(65000);
+
+				break;
+			case 2: //red
+					GPIOE->PDOR |= 0x4000000;/**Green led off*/
+					GPIOB->PDOR &= ~(0x00400000);/**Red led on*/
+					delay(65000);
+
+				break;
+			case 3: //purple
+					GPIOB->PDOR &= ~(0x00400000);/**Red led on*/
+					GPIOB->PDOR &= ~(0x00200000);/**Blue led on*/
+					GPIOE->PDOR |= ~(0x4000000);/**Green led off*/
+					delay(65000);
+
+				break;
+			case 4: //blue
+
+						GPIOE->PDOR |= 0x4000000;/**Green led off*/
+						GPIOB->PDOR &= 0x00400000;/**Red led off*/
+						GPIOB->PDOR |= ~(0x00200000);/**Blue led on*/
+				delay(65000);
+
+				break;
+			case 5: //green
+					GPIOB->PDOR &= 0x00600000;/**Red led off*/
+					GPIOB->PDOR |= 0x00200000;/**Blue led on*/
+					GPIOE->PDOR &= ~(0x4000000);/**Green led on*/
+					delay(65000);
+
+				break;
+					default:
+			break;			 }
+
+
 			delay(65000);
-			GPIOB->PDOR |= 0x00400000;/**Read led off*/
-			delay(65000);
-			GPIOE->PDOR |= 0x4000000;/**Green led off*/
-			delay(65000);
-    }
-    return 0 ;
+	    }
+	    return 0 ;
 }
-
 ////////////////////////////////////////////////////////////////////////////////
 // EOF
 ////////////////////////////////////////////////////////////////////////////////
