@@ -63,7 +63,10 @@ int main(void) {
 	  /**Assigns a safe value to the output pin26 of the GPIOE*/
 	  GPIOE->PDOR |= 0x04000000;
 
+
+	  /**Configures GPIOC pin6 as input*/
 		GPIOC->PDDR &=~(0x40);
+		/**Configures GPIOA pin4 as input*/
 		GPIOA->PDDR &=~(0x10);
 		/**Configures GPIOB pin21 as output*/
 		GPIOB->PDDR = 0x00200000;
@@ -81,11 +84,12 @@ int main(void) {
 			/**Note that the comparison is not inputValur == False, because it is safer if we switch the arguments*/
 
 			if(FALSE == inputValue ) //evaluar primero si los 2 estan apretados
-			{GPIOB->PDOR &= ~0x00200000;/**Blue led off*/
-			GPIOE->PDOR &= ~(0x4000000);/**Green led on*/
-			GPIOB->PDOR &= ~(0x00400000);/**Red led on*/
-			printf("los 2\n");
-			delay(65000);
+			{
+				GPIOB->PDOR &= ~0x00200000;/**Blue led off*/
+				GPIOE->PDOR &= ~(0x4000000);/**Green led on*/
+				GPIOB->PDOR &= ~(0x00400000);/**Red led on*/
+				printf("los 2\n");
+				delay(2*65000);
 			}
 			else if (0x40 == inputValue) //evaluar sw2
 			{
@@ -93,16 +97,23 @@ int main(void) {
 				{
 					contador=0;
 				}
-				contador++;
-				printf("contador =%d\n", contador);
+				else {
+					contador++;
+					printf("contador =%d\n", contador);
+					delay(65000);
+				}
+
 			}
 			else if (0x10 == inputValue) //evaluar  sw3
 			{ 	if (contador<=1)
 				{
 				contador=6;
 				}
-				contador--;
-				printf("contador =%d\n", contador);
+			else {
+								contador--;
+								printf("contador =%d\n", contador);
+								delay(65000);
+							}
 			}
 
 			switch(contador){ //0: apagar todo 1:verde 2:azul 3:morado 4:rojo 5:amarillo
@@ -123,8 +134,10 @@ int main(void) {
 
 				break;
 			case 2: //red
-					GPIOE->PDOR |= 0x4000000;/**Green led off*/
-					GPIOB->PDOR &= ~(0x00400000);/**Red led on*/
+				GPIOB->PDOR |= 0x00200000;/**Blue led off*/
+				GPIOB->PDOR |= ~(0x00400000);/**Read led on*/
+				GPIOE->PDOR |= 0x4000000;/**Green led off*/
+								delay(65000);
 					delay(65000);
 
 				break;
@@ -144,10 +157,11 @@ int main(void) {
 
 				break;
 			case 5: //green
-					GPIOB->PDOR &= 0x00600000;/**Red led off*/
-					GPIOB->PDOR |= 0x00200000;/**Blue led on*/
-					GPIOE->PDOR &= ~(0x4000000);/**Green led on*/
-					delay(65000);
+				GPIOB->PDOR |= 0x00200000;/**Blue led off*/
+				GPIOB->PDOR |= 0x00400000;/**Read led off*/
+				GPIOE->PDOR |= 0x4000000;/**Green led on*/
+				GPIOE->PDOR &= ~(0x4000000);/**Green led on*/
+				delay(65000);
 
 				break;
 					default:
@@ -158,13 +172,11 @@ int main(void) {
 	    }
 	    return 0 ;
 }
-////////////////////////////////////////////////////////////////////////////////
-// EOF
-////////////////////////////////////////////////////////////////////////////////
+
+
 void delay(uint16 delay)
 {
 	volatile uint16 counter;
-
 	for(counter=delay; counter > 0; counter--)
 	{
 	}
