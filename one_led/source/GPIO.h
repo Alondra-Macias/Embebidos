@@ -6,7 +6,6 @@
  */
 
 #include "DataTypeDefinitions.h"
-
 #ifndef GPIO_H_
 #define GPIO_H_
 

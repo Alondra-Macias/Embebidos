@@ -145,4 +145,28 @@ void GPIO_clockGating(GPIO_portNameType portName)
 			break;
 	}
 }
+uint8 GPIO_inputRegister(GPIO_portNameType portName){
+	uint8 value;
+	switch(portName)
+		{
+			case (GPIO_A):
+				value = GPIOA->PDIR;
+				break;
+			case (GPIO_B):
+				value = GPIOB->PDIR;
+				break;
+			case (GPIO_C):
+				value = GPIOC->PDIR;
+				break;
+			case (GPIO_D):
+				value = GPIOD->PDIR;
+				break;
+			case (GPIO_E):
+				value = GPIOE->PDIR;
+				break;
+			default:
+				break;
+		}
+	return (value);
+}
 

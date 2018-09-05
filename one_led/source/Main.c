@@ -39,6 +39,30 @@
 #include "DataTypeDefinitions.h"
 #include "MK64F12.h"
 
+/*uint8 GPIO_inputRegister(GPIO_portNameType portName){
+	uint8 value;
+	switch(portName)
+		{
+			case (GPIO_A):
+				value = GPIOA->PDIR;
+				break;
+			case (GPIO_B):
+				value = GPIOB->PDIR;
+				break;
+			case (GPIO_C):
+				value = GPIOC->PDIR;
+				break;
+			case (GPIO_D):
+				value = GPIOD->PDIR;
+				break;
+			case (GPIO_E):
+				value = GPIOE->PDIR;
+				break;
+			default:
+				break;
+		}
+	return (value);
+}
 void delay(uint16 delay);
 /*
  * @brief   Application entry point.
@@ -85,7 +109,7 @@ int main(void) {
 
 			if(FALSE == inputValue ) //evaluar primero si los 2 estan apretados
 			{
-				GPIOB->PDOR &= ~0x00200000;/**Blue led off*/
+				GPIOB->PDOR &= ~(0x00200000);/**Blue led on*/
 				GPIOE->PDOR &= ~(0x4000000);/**Green led on*/
 				GPIOB->PDOR &= ~(0x00400000);/**Red led on*/
 				printf("los 2\n");
