@@ -23,24 +23,24 @@
  	 \return 1 if the portName is valid else return 0
 
  */
-uint8 GPIO_pinControlRegister(GPIO_portNameType portName, uint8 pin, const GPIO_pinControlRegisterType*  pinControlRegister)
+uint8 GPIO_pinControlRegister(GPIO_portNameType portName, uint8 pin, uint32  pinControlRegister)
 {
 	switch(portName)
 		{
 			case (GPIO_A):	/** GPIO A is selected*/
-				PORTA->PCR[pin] = *pinControlRegister;
+				PORTA->PCR[pin] = pinControlRegister;
 				break;
 			case (GPIO_B):	/** GPIO B is selected*/
-				PORTB->PCR[pin] = *pinControlRegister;
+				PORTB->PCR[pin] = pinControlRegister;
 				break;
 			case (GPIO_C):	/** GPIO C is selected*/
-				PORTC->PCR[pin] = *pinControlRegister;
+				PORTC->PCR[pin] = pinControlRegister;
 				break;
 			case (GPIO_D):	/** GPIO D is selected*/
-				PORTD->PCR[pin] = *pinControlRegister;
+				PORTD->PCR[pin] = pinControlRegister;
 				break;
 			case (GPIO_E):	/** GPIO E is selected*/
-				PORTE->PCR[pin] = *pinControlRegister;
+				PORTE->PCR[pin] = pinControlRegister;
 				break;
 			default:
 				return (FALSE);
@@ -145,28 +145,3 @@ void GPIO_clockGating(GPIO_portNameType portName)
 			break;
 	}
 }
-uint8 GPIO_inputRegister(GPIO_portNameType portName){
-	uint8 value;
-	switch(portName)
-		{
-			case (GPIO_A):
-				value = GPIOA->PDIR;
-				break;
-			case (GPIO_B):
-				value = GPIOB->PDIR;
-				break;
-			case (GPIO_C):
-				value = GPIOC->PDIR;
-				break;
-			case (GPIO_D):
-				value = GPIOD->PDIR;
-				break;
-			case (GPIO_E):
-				value = GPIOE->PDIR;
-				break;
-			default:
-				break;
-		}
-	return (value);
-}
-

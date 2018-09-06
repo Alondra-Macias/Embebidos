@@ -5,7 +5,13 @@
  *      Author: marga
  */
 
+#include "board.h"
 #include "DataTypeDefinitions.h"
+#include "peripherals.h"
+#include "pin_mux.h"
+#include "clock_config.h"
+#include "MK64F12.h"
+#include "fsl_debug_console.h"
 #ifndef GPIO_H_
 #define GPIO_H_
 
@@ -29,17 +35,21 @@
 /*Selects Alternative 1 for GPIO*/
 #define GPIO_MUX_1 0x00000100
 /*Selects Alternative 2 for GPIO*/
-#define GPIO_MUX_1 0x00000200
+#define GPIO_MUX_2 0x00000200
 /*Selects Alternative 3 for GPIO*/
-#define GPIO_MUX_1 0x00000300
+#define GPIO_MUX_3 0x00000300
 /*Selects Alternative 4 for GPIO*/
-#define GPIO_MUX_1 0x00000400
+#define GPIO_MUX_4 0x00000400
 /*Selects Alternative 5 for GPIO*/
-#define GPIO_MUX_1 0x00000500
+#define GPIO_MUX_5 0x00000500
 /*Selects Alternative 6 for GPIO*/
-#define GPIO_MUX_1 0x00000600
+#define GPIO_MUX_6 0x00000600
 /*Selects Alternative 7 for GPIO*/
-#define GPIO_MUX_1 0x00000700
+#define GPIO_MUX_7 0x00000700
+
+
+/*! This data type is used to configure the pin control register*/
+typedef const uint32 GPIO_pinControlRegisterType;
 
 /*Constants used to define if the pin is used as an input or output*/
 typedef enum {GPIO_INPUT,/*!< Definition to configure a pin as input */
@@ -69,7 +79,7 @@ typedef enum {GPIO_INPUT,/*!< Definition to configure a pin as input */
  	 \return 1 if the portName is valid else return 0
 
  */
-//uint8 GPIO_pinControlRegister(GPIO_portNameType portName, uint8 pinNumber, const GPIO_pinControlRegisterType*  pinControlRegister);
+uint8 GPIO_pinControlRegister(GPIO_portNameType portName, uint8 pinNumber, uint32  pinControlRegister);
 
 
 /*
@@ -80,7 +90,7 @@ typedef enum {GPIO_INPUT,/*!< Definition to configure a pin as input */
  	 \param[in]  pinConf value to set on previously specified pin
  	 \return void
  */
-void GPIO_dataDirectionRegister(GPIO_portNameType portName, uint32 pinNumber, GPIO_PIN_CONFIG pinConf);
+void GPIO_dataDirectionRegister(GPIO_portNameType portName, uint32 pinNumber);
 
 
 /*
@@ -101,17 +111,6 @@ void GPIO_dataOutputRegister(GPIO_portNameType portName, uint32 data);
  	 \return 1 if the portName is valid else return 0
  */
 void GPIO_clockGating(GPIO_portNameType portName);
-
-
-
-
-
-
-
-
-
-
-
 
 
 #endif /* GPIO_H_ */

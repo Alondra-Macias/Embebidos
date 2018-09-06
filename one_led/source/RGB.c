@@ -1,73 +1,80 @@
 /*
  * RGB.c
  *
- *  Created on: 05/09/2018
- *      Author: AlondraItzel
+ *  Created on: Sep 5, 2018
+ *      Author: marga
  */
-#include "MK64F12.h"
-#include "DataTypeDefinitions.h"
-#include "GPIO.h"
+
 #include "RGB.h"
+#include "GPIO.h"
 
-
-
-
-/*void RGBySw_CR(){
-		GPIO_pinControlRegister(PORTA, SW3pin, PCSW);
-		GPIO_pinControlRegister(PORTB, PinBlue, PORT_PCR_MUX(1));
-		GPIO_pinControlRegister(PORTB, PinRed, PORT_PCR_MUX(1));
-		GPIO_pinControlRegister(PORTC, SW2pin, PCSW);
-		GPIO_pinControlRegister(PORTE, PinGreen, PORT_PCR_MUX(1));
-}*/
-
-void RGB_PDOR(){
-	GPIO_dataDirectionRegister(GPIO_B, Blue);
-	GPIO_dataDirectionRegister(GPIO_B, Red);
-	GPIO_dataDirectionRegister(GPIO_E, Green);
-	}
-void RGB_DR(){
-	GPIO_dataDirectionRegister(GPIO_C, Pin6);
-	GPIO_dataDirectionRegister(GPIO_A, Pin4);
-	GPIO_dataDirectionRegister(GPIO_B, Blue);
-	GPIO_dataDirectionRegister(GPIO_B, Red);
-	GPIO_dataDirectionRegister(GPIO_E, Green);
-}
-void init_CG(){	/*Initializes Clock Gating for ports A, B, C and E*/
-GPIO_clockGating(GPIO_A);
-GPIO_clockGating(GPIO_B);
-GPIO_clockGating(GPIO_C);
-GPIO_clockGating(GPIO_E);
-}
-
-uint8 GetSw(){uint8 value;
-	//value = GPIO_inputRegister(GPIO_C); | GPIO_inputRegister(GPIO_A);
-	value=value & Mask1;
-	return(value);
-}
-void RGB_on(LED_Color color){
+/*This function turns on the proper color combination to show the selected color*/
+void LED_On(RGB_color color){
 	switch(color)
-			{
-				case (Verde):	/** GPIO A is selected*/
-	         /*	GPIO_dataOutputRegister(GPIO_B, &~Red);
-				GPIO_dataOutputRegister(GPIO_B, Blue);
-				GPIO_dataOutputRegister(GPIO_B, Red);
-				GPIO_dataOutputRegister(GPIO_B, Green);*/
-							//GPIOB->PDOR &= ~(0x0400000);/**red led on*/
-							//GPIOB->PDOR |= 0x00200000;/**Blue led off*/
-							//GPIOE->PDOR &= ~(0x4000000);/**Green led on
-					break;
-				case (Azul):
-					break;
-				case (Morado):
-					break;
-				case (Rojo):
-					break;
-				case (Amarillo):
-					break;
-				case (Blanco):
-					break;
-				default:
-					break;
-							}
+	{
+		case RGB_white:
+			GPIO_dataOutputRegister(GPIO_B, ~(RGB_PurpleLED));
+			GPIO_dataOutputRegister(GPIO_E, ~(RGB_GreenLED));
+			break;
+		case RGB_red:
+			GPIO_dataOutputRegister(GPIO_B, ~(RGB_RedLED));
+			GPIO_dataOutputRegister(GPIO_E, RGB_LEDsOff);
+			break;
+		case RGB_blue:
+			GPIO_dataOutputRegister(GPIO_B, ~(RGB_BlueLED));
+			GPIO_dataOutputRegister(GPIO_E, RGB_LEDsOff);
+			break;
+		case RGB_green:
+			GPIO_dataOutputRegister(GPIO_B, RGB_LEDsOff);
+			GPIO_dataOutputRegister(GPIO_E, ~(RGB_GreenLED));
+			break;
+		case RGB_purple:
+			GPIO_dataOutputRegister(GPIO_E, RGB_LEDsOff);
+			GPIO_dataOutputRegister(GPIO_B, ~(RGB_PurpleLED));
+			break;
+		case RGB_yellow:
+			GPIO_dataOutputRegister(GPIO_B, ~(RGB_RedLED));
+			GPIO_dataOutputRegister(GPIO_E, ~(RGB_GreenLED));
+			break;
+		default:
+			break;
+	}
+}
+
+
+void LED_setUp(){
+	/*Configures Blue LED as ALT1*/
+	GPIO_pinControlRegister(GPIO_B,  BlueLED_pin, GPIO_MUX_1);
+	/*Configures Red LED as ALT1*/
+	GPIO_pinControlRegister(GPIO_E, GreenLED_pin, GPIO_MUX_1);
+	/*Configures Green LED as ALT1*/
+	GPIO_pinControlRegister(GPIO_B,  RedLED_pin, GPIO_MUX_1);
+
+	 /**Configures GPIOB pins 21 and 22 as output*/
+	GPIO_dataDirectionRegister(GPIO_B, RGB_BlueLED | RGB_RedLED);
+	/**Configures GPIOB pin22 as output*/
+	GPIO_dataDirectionRegister(GPIO_E, RGB_GreenLED);
+}
+
+
+void SW_setUp(){
+
+	/*Configures SW2 as ALT1, with Pull up resistor enabled */
+	GPIO_pinControlRegister(GPIO_C, SW2_pin, GPIO_MUX_1 | GPIO_PS | GPIO_PE);
+	/*Configures SW3 as ALT1, with Pull up resistor enabled */
+	GPIO_pinControlRegister(GPIO_A, SW3_pin, GPIO_MUX_1 | GPIO_PS | GPIO_PE);
+
+	/*configures Sw2 as input*/
+	GPIO_dataDirectionRegister(GPIO_C, ~(SW2_port));
+	/*configures Sw3 as input*/
+	GPIO_dataDirectionRegister(GPIO_A, ~(SW3_port));
+}
+
+
+void LEDsOff(){
+	/*Turns off LEDs red and blue on port B*/
+	GPIO_dataOutputRegister(GPIO_B, RGB_purple);
+	/*Turns off green LED on port E*/
+	GPIO_dataOutputRegister(GPIO_E,	RGB_green);
 }
 
