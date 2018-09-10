@@ -88,6 +88,11 @@ Colors_t RGB_color_selector(void)
 			color--;
 		}
 	}
+	else if(SW3 == total_color && SW2 == total_color)
+	{
+			color = WHITE;
+
+	}
 
 	do
 	{
@@ -215,6 +220,12 @@ void RGB_yellow(void)
 	RGB_green_led_on_off(LED_OFF);
 	RGB_yellow_led_on_off(LED_ON);
 }
+void RGB_white(void)
+{
+	RGB_red_led_on_off(LED_ON);
+	RGB_green_led_on_off(LED_ON);
+	RGB_yellow_led_on_off(LED_ON);
+}
 
 void no_color(void)
 {
@@ -249,7 +260,8 @@ void RGB_led_on(Colors_t color)
 			printf("yellow\n");
 			break;
 		case (WHITE):
-			no_color();
+			RGB_white();
+			printf("white\n");
 			break;
 		default:
 			no_color();
