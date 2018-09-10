@@ -12,28 +12,30 @@
 
 
 void RGB_init(void)
-{
+{   /*initialize the PCR to GPIO*/
 	gpio_pin_control_register_t led_config = GPIO_MUX1;
 	gpio_pin_control_register_t sw_config = GPIO_MUX1 | GPIO_PE | GPIO_PS | INTR_FALLING_EDGE;
-
+	/*initialize the clocks from the leds*/
 	GPIO_clock_gating(BLUE_LED_PORT);
 	GPIO_clock_gating(RED_LED_PORT);
 	GPIO_clock_gating(GREEN_LED_PORT);
-
+	/*initialize the clocks froms switches*/
 	GPIO_clock_gating(SW2_PORT);
 	GPIO_clock_gating(SW3_PORT);
-
+	/*initialize the pin from every color*/
 	GPIO_set_pin(RED_LED_PORT, RED_LED_PIN);
 	GPIO_set_pin(BLUE_LED_PORT, BLUE_LED_PIN);
 	GPIO_set_pin(GREEN_LED_PORT, GREEN_LED_PIN);
-
+	/*initialize the PCR from LEDs*/
 	GPIO_pin_control_register(BLUE_LED_PORT, BLUE_LED_PIN, &led_config);
 	GPIO_pin_control_register(RED_LED_PORT, RED_LED_PIN, &led_config);
 	GPIO_pin_control_register(GREEN_LED_PORT, GREEN_LED_PIN, &led_config);
-
+	/*initialize the PCR from switches*/
 	GPIO_pin_control_register(SW2_PORT, SW2_PIN, &sw_config);
 	GPIO_pin_control_register(SW3_PORT, SW3_PIN, &sw_config);
 
+
+	/*initialize the direction to output*/
 	GPIO_data_direction_pin(BLUE_LED_PORT, GPIO_OUTPUT, BLUE_LED_PIN);
 	GPIO_data_direction_pin(RED_LED_PORT, GPIO_OUTPUT, RED_LED_PIN);
 	GPIO_data_direction_pin(GREEN_LED_PORT, GPIO_OUTPUT, GREEN_LED_PIN);

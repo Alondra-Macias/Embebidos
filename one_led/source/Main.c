@@ -48,6 +48,7 @@
 /*
  * @brief   Application entry point.
  */
+/*flags used for input from switches*/
 uint8_t FlagPortC = FALSE;
 uint8_t FlagPortA = FALSE;
 
@@ -89,7 +90,7 @@ int main(void) {
 
 	color = RGB_color_selector();
 
-
+/*this loop make the call to interrupt to do in RGB if any flag is on TRUE*/
     while(1)
     {
 
