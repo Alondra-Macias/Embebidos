@@ -1,97 +1,114 @@
-/*
- * GPIO.c
- *
- *  Created on: Sep 4, 2018
- *      Author: marga
- */
-
-#include "GPIO.h"
-#include "MK64F12.h"
-
-
-
-/*
+/**
+	\file
 	\brief
- 	 	 This function configure different characteristics in an specific GPIO:
- 	 	 pullup or pulldown resistor,alternative functions in the GPIO
- 	 \param[in] portName Port to be configured.
- 	 \param[in]  pin Specific pin to be configured.
- 	 \param[in]  pinControlRegister Pointer to a constant configuration value that configures the pin characteristics. In particular this function
- 	 uses the definitions GPIO_PS, GPIO_PE, GPIO_MUX1 etc. For example, in order to configure the pullup resistor ans the pin as GPIO it is need to
- 	 declare the type in following way:
- 	 GPIO_pinControlRegisterType PinControlRegister = GPIO_MUX1|GPIO_PS|GPIO_PE;
- 	 \return 1 if the portName is valid else return 0
-
+		This is the source file for the GPIO device driver for Kinetis K64.
+		It contains all the implementation for configuration functions and runtime functions.
+		i.e., this is the application programming interface (API) for the GPIO peripheral.
+	\author J. Luis Pizano Escalante, luispizano@iteso.mx
+	\date	7/09/2014
+	\todo
+	    Interrupts are not implemented in this API implementation.
  */
-uint8 GPIO_pinControlRegister(GPIO_portNameType portName, uint8 pin, uint32  pinControlRegister)
+#include "MK64F12.h"
+#include "GPIO.h"
+#include "Bits.h"
+
+extern uint8_t FlagPortC;
+extern uint8_t FlagPortA;
+
+void PORTC_IRQHandler()
+{
+	FlagPortC = TRUE;
+	GPIO_clear_interrupt(GPIO_C);
+
+}
+
+
+void PORTA_IRQHandler()
+{
+	FlagPortA = TRUE;
+	GPIO_clear_interrupt(GPIO_A);
+
+}
+
+
+void GPIO_clear_interrupt(gpio_port_name_t portName)
+{
+	switch(portName)/** Selecting the GPIO for clock enabling*/
+	{
+		case GPIO_A: /** GPIO A is selected*/
+			PORTA->ISFR=0xFFFFFFFF;
+			break;
+		case GPIO_B: /** GPIO B is selected*/
+			PORTB->ISFR=0xFFFFFFFF;
+			break;
+		case GPIO_C: /** GPIO C is selected*/
+			PORTC->ISFR = 0xFFFFFFFF;
+			break;
+		case GPIO_D: /** GPIO D is selected*/
+			PORTD->ISFR=0xFFFFFFFF;
+			break;
+		default: /** GPIO E is selected*/
+			PORTE->ISFR=0xFFFFFFFF;
+			break;
+
+	}// end switch
+}
+uint8_t GPIO_clock_gating(gpio_port_name_t portName)
+{
+	switch(portName)/** Selecting the GPIO for clock enabling*/
+			{
+				case GPIO_A: /** GPIO A is selected*/
+					SIM->SCGC5 |= GPIO_CLOCK_GATING_PORTA; /** Bit 9 of SIM_SCGC5 is  set*/
+					break;
+				case GPIO_B: /** GPIO B is selected*/
+					SIM->SCGC5 |= GPIO_CLOCK_GATING_PORTB; /** Bit 10 of SIM_SCGC5 is set*/
+					break;
+				case GPIO_C: /** GPIO C is selected*/
+					SIM->SCGC5 |= GPIO_CLOCK_GATING_PORTC; /** Bit 11 of SIM_SCGC5 is set*/
+					break;
+				case GPIO_D: /** GPIO D is selected*/
+					SIM->SCGC5 |= GPIO_CLOCK_GATING_PORTD; /** Bit 12 of SIM_SCGC5 is set*/
+					break;
+				case GPIO_E: /** GPIO E is selected*/
+					SIM->SCGC5 |= GPIO_CLOCK_GATING_PORTE; /** Bit 13 of SIM_SCGC5 is set*/
+					break;
+				default: /**If doesn't exist the option*/
+					return(FALSE);
+			}// end switch
+	/**Successful configuration*/
+	return(TRUE);
+}// end function
+
+uint8_t GPIO_pin_control_register(gpio_port_name_t portName, uint8_t pin,const gpio_pin_control_register_t*  pinControlRegister)
 {
 	switch(portName)
 		{
-			case (GPIO_A):	/** GPIO A is selected*/
-				PORTA->PCR[pin] = pinControlRegister;
-				break;
-			case (GPIO_B):	/** GPIO B is selected*/
-				PORTB->PCR[pin] = pinControlRegister;
-				break;
-			case (GPIO_C):	/** GPIO C is selected*/
-				PORTC->PCR[pin] = pinControlRegister;
-				break;
-			case (GPIO_D):	/** GPIO D is selected*/
-				PORTD->PCR[pin] = pinControlRegister;
-				break;
-			case (GPIO_E):	/** GPIO E is selected*/
-				PORTE->PCR[pin] = pinControlRegister;
-				break;
-			default:
-				return (FALSE);
-				break;
+		case GPIO_A:/** GPIO A is selected*/
+			PORTA->PCR[pin] = *pinControlRegister;
+			break;
+		case GPIO_B:/** GPIO B is selected*/
+			PORTB->PCR[pin] = *pinControlRegister;
+			break;
+		case GPIO_C:/** GPIO C is selected*/
+			PORTC->PCR[pin] = *pinControlRegister;
+			break;
+		case GPIO_D:/** GPIO D is selected*/
+			PORTD->PCR[pin] = *pinControlRegister;
+			break;
+		case GPIO_E: /** GPIO E is selected*/
+			PORTE->PCR[pin]= *pinControlRegister;
+		default:/**If doesn't exist the option*/
+			return(FALSE);
+		break;
 		}
-	return (TRUE);
+	/**Successful configuration*/
+	return(TRUE);
 }
 
-
-/*
- \brief
- 	 	 This function configures a specific GPIO pin as input or as output
- 	 \param[in] portName Port to be configured.
- 	 \param[in]  pinConf value to set on previously specified pin
- 	 \return void
- */
-void GPIO_dataDirectionRegister(GPIO_portNameType portName, uint32 portConf)
+void GPIO_write_port(gpio_port_name_t portName, uint32_t data)
 {
-	switch(portName)
-	{
-		case (GPIO_A):
-			GPIOA->PDDR = portConf;
-			break;
-		case (GPIO_B):
-			GPIOB->PDDR = portConf;
-			break;
-		case (GPIO_C):
-			GPIOC->PDDR = portConf;
-			break;
-		case (GPIO_D):
-			GPIOD->PDDR = portConf;
-			break;
-		case (GPIO_E):
-			GPIOE->PDDR = portConf;
-			break;
-		default:
-			break;
-	}
-}
-
-
-/*
- \brief
- 	 	 This function configures a specific GPIO pin as input or as output
- 	 \param[in] portName Port to be configured.
- 	 \param[in]  data value to be set on the specific port.
- 	 \return void
- */
-void GPIO_dataOutputRegister(GPIO_portNameType portName, uint32 data)
-{
-	switch(portName)
+	switch (portName)
 	{
 		case (GPIO_A):
 			GPIOA->PDOR = data;
@@ -113,35 +130,187 @@ void GPIO_dataOutputRegister(GPIO_portNameType portName, uint32 data)
 	}
 }
 
-
-
-/*!
- 	 \brief	 This function enables the GPIO clock by configuring the corresponding bit
- 	 	 and register in the System Clock Gating Control Register.
-
- 	 \param[in]  portName Port to be configured.
- 	 \return 1 if the portName is valid else return 0
- */
-void GPIO_clockGating(GPIO_portNameType portName)
+uint32_t GPIO_read_port(gpio_port_name_t portName)
 {
-	switch(portName)
+	switch (portName)
 	{
 		case (GPIO_A):
-			SIM->SCGC5 |= GPIO_SCGC5_PORTA;
+			return (GPIOA->PDIR);
 			break;
 		case (GPIO_B):
-			SIM->SCGC5 |= GPIO_SCGC5_PORTB;
+			return (GPIOB->PDIR);
 			break;
 		case (GPIO_C):
-			SIM->SCGC5 |= GPIO_SCGC5_PORTC;
+			return (GPIOC->PDIR);
 			break;
 		case (GPIO_D):
-			SIM->SCGC5 |= GPIO_SCGC5_PORTD;
+			return (GPIOD->PDIR);
 			break;
 		case (GPIO_E):
-			SIM->SCGC5 |= GPIO_SCGC5_PORTE;
+			return (GPIOE->PDIR);
+			break;
+		default:
+			return (0);
+			break;
+	}
+}
+
+
+uint8_t GPIO_read_pin(gpio_port_name_t portName, uint8_t pin)
+{
+
+	uint8_t retValue = 0;
+
+	switch (portName)
+	{
+		case (GPIO_A):
+			retValue = (GPIOA->PDIR) >> pin;
+			break;
+		case (GPIO_B):
+			retValue = (GPIOB->PDIR) >> pin;
+			break;
+		case (GPIO_C):
+			retValue = (GPIOC->PDIR) >> pin;
+			break;
+		case (GPIO_D):
+			retValue = (GPIOD->PDIR) >> pin;
+			break;
+		case (GPIO_E):
+			retValue = (GPIOE->PDIR) >> pin;
+			break;
+		default:
+			return (FALSE);
+	}
+	return retValue;
+}
+
+void GPIO_set_pin(gpio_port_name_t portName, uint8_t pin)
+{
+	uint32_t value = MASK_PIN_SELECTED;
+	value <<= pin;
+	switch (portName)
+	{
+		case (GPIO_A):
+			GPIOA->PSOR |= value;
+			break;
+		case (GPIO_B):
+			GPIOB->PSOR |= value;
+			break;
+		case (GPIO_C):
+			GPIOC->PSOR |= value;
+			break;
+		case (GPIO_D):
+			GPIOD->PSOR |= value;
+			break;
+		case (GPIO_E):
+			GPIOE->PSOR |= value;
 			break;
 		default:
 			break;
 	}
 }
+
+void GPIO_clear_pin(gpio_port_name_t portName, uint8_t pin)
+{
+	uint32_t value = MASK_PIN_SELECTED;
+	value <<= pin;
+	switch (portName)
+	{
+		case (GPIO_A):
+			GPIOA->PCOR |= value;
+			break;
+		case (GPIO_B):
+			GPIOB->PCOR |= value;
+			break;
+		case (GPIO_C):
+			GPIOC->PCOR |= value;
+			break;
+		case (GPIO_D):
+			GPIOD->PCOR |= value;
+			break;
+		case (GPIO_E):
+			GPIOE->PCOR |= value;
+			break;
+		default:
+			break;
+	}
+}
+
+void GPIO_toogle_pin(gpio_port_name_t portName, uint8_t pin)
+{
+	uint32_t value = MASK_PIN_SELECTED;
+	value <<= pin;
+	switch (portName)
+	{
+		case (GPIO_A):
+			GPIOA->PTOR = value;
+			break;
+		case (GPIO_B):
+			GPIOB->PTOR = value;
+			break;
+		case (GPIO_C):
+			GPIOC->PTOR = value;
+			break;
+		case (GPIO_D):
+			GPIOD->PTOR = value;
+			break;
+		case (GPIO_E):
+			GPIOE->PTOR = value;
+			break;
+		default:
+			break;
+	}
+}
+
+void GPIO_data_direction_port(gpio_port_name_t portName ,uint32_t direction)
+{
+	switch(portName)
+	{
+		case (GPIO_A):
+			GPIOA->PDDR = direction;
+			break;
+		case (GPIO_B):
+			GPIOB->PDDR = direction;
+			break;
+		case (GPIO_C):
+			GPIOC->PDDR = direction;
+			break;
+		case (GPIO_D):
+			GPIOD->PDDR = direction;
+			break;
+		case (GPIO_E):
+			GPIOE->PDDR = direction;
+			break;
+		default:
+			break;
+	}
+}
+
+void GPIO_data_direction_pin(gpio_port_name_t portName, uint8_t state, uint8_t pin)
+{
+	uint32_t value = state;
+	value <<= pin;
+	switch (portName)
+	{
+		case (GPIO_A):
+			GPIOA->PDDR |= value;
+			break;
+		case (GPIO_B):
+			GPIOB->PDDR |= value;
+			break;
+		case (GPIO_C):
+			GPIOC->PDDR |= value;
+			break;
+		case (GPIO_D):
+			GPIOD->PDDR |= value;
+			break;
+		case (GPIO_E):
+			GPIOE->PDDR |= value;
+			break;
+		default:
+			break;
+	}
+}
+
+
+

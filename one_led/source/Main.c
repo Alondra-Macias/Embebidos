@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, NXP Semiconductor, Inc.
+ * Copyright 2016-2018 NXP Semiconductor, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -29,147 +29,88 @@
  */
  
 /**
- * @file    PushButton.c
+ * @file    MK64FN1M0xxx12_Project.c
  * @brief   Application entry point.
  */
-
-#include "DataTypeDefinitions.h"
+#include <stdio.h>
+#include "board.h"
+#include "peripherals.h"
+#include "pin_mux.h"
+#include "clock_config.h"
 #include "MK64F12.h"
+#include "fsl_debug_console.h"
 #include "RGB.h"
-#include "GPIO.h"
+#include "Delay.h"
+/* TODO: insert other include files here. */
+
+/* TODO: insert other definitions and declarations here. */
 
 /*
  * @brief   Application entry point.
  */
-/*ponding pin for Switch 3 on port A*/
-
-
-/*Value set for use on the delay() function*/
-#define DELAY 65000u
-
-
-
-
-void delay(uint16 delay);
-
+uint8_t FlagPortC = FALSE;
+uint8_t FlagPortA = FALSE;
 
 int main(void) {
-	/**Variable to capture the input value*/
-		uint32 inputValue = 0;
 
-	/*Initializes Clock Gating for ports A, B, C and E*/
-	  GPIO_clockGating(GPIO_A);
-	  GPIO_clockGating(GPIO_B);
-	  GPIO_clockGating(GPIO_C);
-	  GPIO_clockGating(GPIO_E);
+	uint8_t statePortC = 0;
+	uint8_t statePortA = 0;
 
-	  /*Configure RGB LED pins for GPIO with MUX_Alt 1 and as output */
-	  LED_setUp();
-	  /**Assigns a safe value to the output pins 21 and 22 of the GPIOB and for pin 26 of the GPIOE*/
-	  LEDsOff();
-	  /**Configures for GPIO the switch pins with MUX_Alt 1 and as input with pull-up resistors enabled*/
-	  SW_setUp();
+	gpio_pin_control_register_t input_intr_config = GPIO_MUX1|GPIO_PE|GPIO_PS|INTR_FALLING_EDGE;
 
+	Colors_t color = NO_COLOR;
 
-	  /*Initializes the counter to the first state*/
-		int contador=1;
-	    while(1) {
-	    	/**Reads all the GPIOC*/
-			inputValue = GPIOC->PDIR | GPIOA->PDIR ;
-			/**Masks the GPIOC in the bit of interest*/
-			inputValue = inputValue & 0x50;
-			/**Note that the comparison is not inputValur == False, because it is safer if we switch the arguments*/
+	RGB_init();
 
-			/*Check if both switches are pressed*/
-			if(FALSE == inputValue)
-			{
-				LED_On(RGB_white);	//turns on all LEDs
-				delay(DELAY);
-			}
+	RGB_red_led_on_off(LED_ON);
+	delay(DELAY);
+	RGB_red_led_on_off(LED_OFF);
+	delay(DELAY);
+	RGB_blue_led_on_off(LED_ON);
+	delay(DELAY);
+	RGB_blue_led_on_off(LED_OFF);
+	delay(DELAY);
+	RGB_green_led_on_off(LED_ON);
+	delay(DELAY);
+	RGB_green_led_on_off(LED_OFF);
+	delay(DELAY);
+	RGB_yellow_led_on_off(LED_ON);
+	delay(DELAY);
+	RGB_yellow_led_on_off(LED_OFF);
+	delay(DELAY);
+	RGB_white_led_on_off(LED_ON);
+	delay(DELAY);
+	RGB_white_led_on_off(LED_OFF);
+	delay(DELAY);
+	RGB_purple_led_on_off(LED_ON);
+	delay(DELAY);
+	RGB_purple_led_on_off(LED_OFF);
+	delay(DELAY);
 
-			/*Checks if SW2 is either pressed*/
-			else if (0x40 == inputValue)
-			{
-				if (contador>=5 )  //If counter is at top value, restarts its value to the first state
-				{
-					contador=1;
-				}
-				else
-				{
-					contador++;			//Other way, it increments by one the counter
-					delay(DELAY);
-				}
-
-				/*Checks if SW3 is either pressed*/
-			}
-			else if (0x10 == inputValue)
-			{ 	if (contador<=1)
-				{
-					contador=6;	 //If counter is at lowest value, restarts its value to the last state
-				}
-				else
-				{
-					contador--;		//Decreases counter value by one
-					delay(DELAY);
-				}
-			}
+	color = RGB_color_selector();
 
 
-			/*Evaluates the counter's value and turns on the respective LEDs*/
-			switch(contador){ //0: apagar todo 1:verde 2:azul 3:morado 4:rojo 5:amarillo
-			case RGB_white:
-				LEDsOff();
-				delay(DELAY);
-				break;
+    while(1)
+    {
 
-			case RGB_yellow: //yellow
-				LEDsOff();
-				LED_On(RGB_yellow);
-				delay(DELAY);
-				break;
 
-			case RGB_red:
-				LEDsOff();
-				LED_On(RGB_red);
-				delay(DELAY);
-				break;
+    	if(TRUE == FlagPortC)
+    	{
+        	color = RGB_color_selector();
+    		RGB_led_on(color);
+    		statePortC = !statePortC;
+    		FlagPortC = FALSE;
+    	}
 
-			case RGB_purple:
-				LEDsOff();
-				LED_On(RGB_purple);
-				delay(DELAY);
-				break;
+    	if(TRUE == FlagPortA)
+		{
+    		color = RGB_color_selector();
+			RGB_led_on(color);
+			statePortA = !statePortA;
+			FlagPortA = FALSE;
+		}
 
-			case RGB_blue:
-				LEDsOff();
-				LED_On(RGB_blue);
-				delay(DELAY);
-				break;
 
-			case RGB_green:
-				LEDsOff();
-				LED_On(RGB_green);
-				delay(DELAY);
-
-				break;
-			default:
-				break;
-			}
-
-			delay(DELAY);
-	    }
-	    return 0 ;
+    }
+    return 0 ;
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// EOF
-////////////////////////////////////////////////////////////////////////////////
-
-void delay(uint16 delay)
-{
-	volatile uint16 counter;
-	for(counter=delay; counter > 0; counter--)
-	{
-	}
-}
-

@@ -1,84 +1,65 @@
 /*
  * RGB.h
  *
- *  Created on: Sep 5, 2018
+ *  Created on: Sep 8, 2018
  *      Author: marga
  */
 
 #ifndef RGB_H_
 #define RGB_H_
- /*! These constants are used to select a specific color (value) to use in the ports */
-typedef enum{
-		RGB_white,
-		RGB_yellow,
-		RGB_red,
-		RGB_purple,
-		RGB_blue,
-		RGB_green
-}RGB_color;
 
-/*! These constants are used to select between SW2 and SW3*/
-typedef enum{SW2,
-			SW3
-}SWITCH_name;
+#include "stdint.h"
+#include "Bits.h"
+#include "GPIO.h"
 
 
-/*Value used to manipulate corresponding pin for BLUE LED on port B*/
-#define RGB_BlueLED 0x00200000
-/*Value used to manipulate corresponding pin for RED LED on port B*/
-#define RGB_RedLED 0x00400000
-/*Value used to manipulate corresponding pin for GREEN LED on port C*/
-#define RGB_GreenLED 0x04000000
-/*Value used to turn 1 all pins on a port*/
-#define RGB_LEDsOff 0xFFFFFFFF
-/*Value used to manipulate corresponding pins for PURPLE LED on port B*/
-#define RGB_PurpleLED 0x00600000
-/*Value used to manipulate corresponding pin for SW3 on port C*/
-#define SW3_port 0x00000010
-/*Value used to manipulate corresponding pin for SW2 on port A*/
-#define SW2_port 0x00000040
+#define LED_ON (0x01u)
+#define LED_OFF (0x00)
 
-/*Constant that represent the pin number for SW2*/
-#define SW2_pin 6
-/*Constant that represent the pin number for SW2*3*/
-#define SW3_pin 4
-/*Constant that represent the pin number for RedLED*/
-#define RedLED_pin 22
-/*Constant that represent the pin number for BlueLED*/
-#define BlueLED_pin 21
-/*Constant that represent the pin number for GreenLED*/
-#define GreenLED_pin 26
+#define BLUE_LED_PORT  GPIO_B
+#define RED_LED_PORT   GPIO_B
+#define GREEN_LED_PORT GPIO_E
+
+#define SW2_PORT GPIO_C
+#define SW3_PORT GPIO_A
 
 
+#define BLUE_LED_PIN  BIT21
+#define RED_LED_PIN   BIT22
+#define GREEN_LED_PIN BIT26
 
-/*
- \brief
- 	 	 This function turns on the necessary LEDs to result on the specified color
- 	 \param[in]  color The resultant color of the RGB combination
- 	 \return void
- */
-void LED_On(RGB_color color);
+#define SW2_PIN BIT6
+#define SW3_PIN BIT4
+
+#define SW2 (0x01u)
+#define SW3 (0x02u)
+#define SW_MASK (0x03)
+
+#define COLOR_LIMIT (0x06u)
 
 
-/*
- \brief
- 	 	 This function configures the three RGB LEDs as GPIO outputs
- 	 \return void
- */
-void LED_setUp();
+typedef enum {GREEN, BLUE, PURPLE, RED, YELLOW, WHITE, NO_COLOR} Colors_t;
 
-/*
- \brief
- 	 	 This function turns all LEDs off
- 	 \return void
- */
-void LEDsOff();
 
-/*
- \brief
- 	 	 This function configures SW2 and SW3 s as GPIO inputs with Pull up resistor enabled
- 	 \return void
- */
-void SW_setUp();
+void RGB_init(void);
+
+Colors_t RGB_color_selector(void);
+
+void RGB_red_led_on_off(uint8_t on_off);
+void RGB_blue_led_on_off(uint8_t on_off);
+void RGB_green_led_on_off(uint8_t on_off);
+
+void RGB_yellow_led_on_off(uint8_t on_off);
+void RGB_white_led_on_off(uint8_t on_off);
+void RGB_purple_led_on_off(uint8_t on_off);
+
+
+void RGB_red(void);
+void RGB_blue(void);
+void RGB_green(void);
+void RGB_purple(void);
+void RGB_yellow(void);
+void RGB_no_color(void);
+void RGB_led_on(Colors_t color);
 
 #endif /* RGB_H_ */

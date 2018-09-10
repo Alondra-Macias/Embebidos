@@ -11,7 +11,7 @@
 #include "pin_mux.h"
 #include "clock_config.h"
 #include "MK64F12.h"
-#include "fsl_debug_console.h"
+//#include "fsl_debug_console.h"
 #ifndef GPIO_H_
 #define GPIO_H_
 
